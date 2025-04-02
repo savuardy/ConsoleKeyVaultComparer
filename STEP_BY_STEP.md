@@ -1,159 +1,189 @@
 # Step-by-Step Guide: Azure Key Vault Secret Comparer
 
+This guide will help you use the Azure Key Vault Secret Comparer tool to compare secrets between different Azure Key Vaults.
+
 ## Prerequisites
 
 ### 1. Install Azure CLI
-```bash
-# For macOS (using Homebrew)
-brew update && brew install azure-cli
-```
+First, you need to install the Azure CLI:
 
-### 2. Login to Azure
-```bash
-az login
-```
-- This will open your browser
-- Sign in with your Azure account
-- Close the browser when done
+1. Open Terminal
+2. Run the following command:
+   ```bash
+   brew install azure-cli
+   ```
 
-### 3. Verify Azure CLI Installation
-```bash
-az account show
-```
-- Should display your Azure account information
+### 2. Log in to Azure
+1. Open Terminal
+2. Run:
+   ```bash
+   az login
+   ```
+3. A browser window will open
+4. Log in with your Azure account
+5. Close the browser when done
+
+### 3. Verify Installation
+1. Run this command to check if you're logged in:
+   ```bash
+   az account show
+   ```
+2. You should see your account information
 
 ## Using the Tool
 
 ### 1. Download and Extract
 1. Download the latest release ZIP file
-2. Extract the ZIP file to a folder
+2. Extract it to a folder
 3. Open Terminal
 4. Navigate to the extracted folder:
    ```bash
-   cd /path/to/extracted/folder
+   cd path/to/extracted/folder
+   ```
+5. Make the script executable:
+   ```bash
+   chmod +x run.sh
    ```
 
-### 2. Make the Script Executable
+### 2. Get Your Key Vault URIs
+1. Open Azure Portal (portal.azure.com)
+2. Go to your Key Vault
+3. Click on "Overview"
+4. Copy the "Vault URI" (looks like: https://your-vault.vault.azure.net/)
+
+### 3. Available Commands
+
+#### List Secrets from a Key Vault
 ```bash
-chmod +x run.sh
+./run.sh list <vault-uri>
 ```
+Example:
+```bash
+./run.sh list https://my-vault.vault.azure.net/
+```
+This will show:
+- All secrets in the specified Key Vault
+- Total number of secrets
+- A table with secret names and their values
 
-### 3. Get Your Key Vault URIs
-1. Go to Azure Portal (portal.azure.com)
-2. Navigate to your source Key Vault
-3. Copy the Key Vault URI (looks like: `https://your-vault-name.vault.azure.net/`)
-4. Repeat for your target Key Vault
-
-### 4. Run the Tool
-
-#### Option 1: Compare Two Key Vaults
+#### Compare Two Key Vaults
+```bash
+./run.sh compare <source-vault-uri> <target-vault-uri>
+```
+Example:
 ```bash
 ./run.sh compare https://source-vault.vault.azure.net/ https://target-vault.vault.azure.net/
 ```
-This will:
-- Show a table of all differences
-- Display statistics about matching and different secrets
-- Show a progress bar of the match rate
 
-#### Option 2: List Secrets from Source Key Vault
-```bash
-./run.sh source https://source-vault.vault.azure.net/ https://target-vault.vault.azure.net/
-```
-This will:
-- Show all secrets from the source Key Vault
-- Display statistics about the secrets
-- Show a progress bar of successful retrievals
+## Understanding the Output
 
-#### Option 3: List Secrets from Target Key Vault
-```bash
-./run.sh target https://source-vault.vault.azure.net/ https://target-vault.vault.azure.net/
-```
-This will:
-- Show all secrets from the target Key Vault
-- Display statistics about the secrets
-- Show a progress bar of successful retrievals
+### List Command Output
+- Shows all secrets in the specified Key Vault
+- Displays total number of secrets
+- Shows a table with secret names and their values
+- Values are truncated if too long for display
 
-### 5. Understanding the Output
+### Compare Command Output
+The tool will show:
+- Total number of secrets
+- Number of matching secrets
+- Number of secrets with different values
+- Secrets only in source vault
+- Secrets only in target vault
+- Match rate percentage
 
-#### Comparison Results
-- **Matching Secrets**: Secrets that exist in both Key Vaults with the same value
-- **Different Values**: Secrets that exist in both Key Vaults but have different values
-- **Source-only Secrets**: Secrets that only exist in the source Key Vault
-- **Target-only Secrets**: Secrets that only exist in the target Key Vault
-- **Match Rate**: Percentage of secrets that match between the Key Vaults
+### Value Display Rules
+- Values are shown as "Not Found" if they don't exist in one vault
+- Values are shown as "Different" if they exist in both vaults but have different values
+- Values are shown as "Same" if they match exactly
+- Long values are truncated for better readability
 
-#### Value Display Rules
-- Values up to 300 characters are shown in full
-- Values longer than 300 characters show as "[yellow]Value too long to display[/]"
-- Missing secrets show as "[red]Not Found[/]"
+## Troubleshooting
 
-### 6. Troubleshooting
+### Common Issues
 
-#### Common Issues
-1. **Permission Errors**
-   - Make sure you're logged in to Azure CLI
-   - Verify you have access to both Key Vaults
-   - Try logging in again: `az login`
+1. **"Not logged in" error**
+   - Run `az login` again
+   - Make sure you're using the correct account
 
-2. **Script Not Found**
+2. **"Access denied" error**
+   - Check if you have access to the Key Vault(s)
+   - Ask your Azure administrator for access
+
+3. **"Invalid URI" error**
+   - Make sure you copied the full Key Vault URI
+   - URI should end with .vault.azure.net/
+
+4. **"Script not found" error**
    - Make sure you're in the correct directory
-   - Verify the script is executable: `ls -l run.sh`
+   - Verify the script is executable (`chmod +x run.sh`)
 
-3. **Invalid URI**
-   - Make sure the Key Vault URIs end with a forward slash (/)
-   - Verify the URIs are correct from Azure Portal
-
-#### Getting Help
-- Check the error messages in red
-- Verify your Azure CLI is up to date: `az upgrade`
-- Make sure you have the latest version of the tool
+### Getting Help
+If you encounter issues:
+1. Check the error message
+2. Verify your Azure CLI installation
+3. Make sure you have the correct permissions
+4. Contact your Azure administrator
 
 ## Security Notes
-- The tool uses your Azure CLI credentials
-- No secrets are stored locally
-- All operations are performed in memory
-- Make sure to close the terminal when done
+
+1. Never share your Azure credentials
+2. Don't store Key Vault URIs in plain text
+3. Use appropriate access controls
+4. Log out when done:
+   ```bash
+   az logout
+   ```
 
 ## Best Practices
-1. Always verify the Key Vault URIs before running
-2. Use the compare command first to get an overview
-3. Use source/target commands for detailed inspection
-4. Keep your Azure CLI up to date
-5. Log out of Azure CLI when done: `az logout`
 
-## Example Workflow
+1. Always verify Key Vault URIs before running commands
+2. Keep your Azure CLI updated
+3. Use the same account for both Key Vaults when comparing
+4. Check permissions before running commands
 
-### 1. First Time Setup
-```bash
-# Install Azure CLI
-brew update && brew install azure-cli
+## Example Workflows
 
-# Login to Azure
-az login
+### List Secrets from a Key Vault
+1. Log in to Azure:
+   ```bash
+   az login
+   ```
 
-# Verify login
-az account show
-```
+2. Navigate to tool directory:
+   ```bash
+   cd path/to/tool
+   ```
 
-### 2. Using the Tool
-```bash
-# Navigate to the tool directory
-cd /path/to/ConsoleKeyVaultComparer
+3. List secrets:
+   ```bash
+   ./run.sh list https://my-vault.vault.azure.net/
+   ```
 
-# Make the script executable
-chmod +x run.sh
+4. Review the results in the table
 
-# Compare two Key Vaults
-./run.sh compare https://source-vault.vault.azure.net/ https://target-vault.vault.azure.net/
-```
+### Compare Two Key Vaults
+1. Log in to Azure:
+   ```bash
+   az login
+   ```
 
-### 3. Cleanup
-```bash
-# Log out of Azure CLI
-az logout
+2. Navigate to tool directory:
+   ```bash
+   cd path/to/tool
+   ```
 
-# Close the terminal
-```
+3. Compare Key Vaults:
+   ```bash
+   ./run.sh compare https://source-vault.vault.azure.net/ https://target-vault.vault.azure.net/
+   ```
+
+4. Review the results in the table
+
+5. Log out when done:
+   ```bash
+   az logout
+   ```
 
 ## Need More Help?
 - Check the error messages in red

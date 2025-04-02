@@ -12,50 +12,36 @@ A command-line tool for comparing secrets between Azure Key Vaults. This tool he
 ### For macOS (x64)
 
 1. Download the latest release for macOS
-2. Make the file executable:
+2. Extract the ZIP file to a folder
+3. Open Terminal
+4. Navigate to the extracted folder
+5. Make the script executable:
    ```bash
-   chmod +x keyvault-comparer
-   ```
-3. Move the file to a directory in your PATH (optional):
-   ```bash
-   sudo mv keyvault-comparer /usr/local/bin/
-   ```
-
-### For Windows
-
-1. Download the latest release for Windows
-2. Add the directory containing the executable to your PATH (optional)
-
-### For Linux
-
-1. Download the latest release for Linux
-2. Make the file executable:
-   ```bash
-   chmod +x keyvault-comparer
-   ```
-3. Move the file to a directory in your PATH (optional):
-   ```bash
-   sudo mv keyvault-comparer /usr/local/bin/
+   chmod +x run.sh
    ```
 
 ## Usage
 
-The tool supports three main commands:
+The tool supports two main commands:
 
-1. List secrets from dev Key Vault:
+1. List secrets from a Key Vault:
    ```bash
-   keyvault-comparer dev
+   ./run.sh list <vault-uri>
    ```
 
-2. List secrets from stage Key Vault:
+2. Compare secrets between two Key Vaults:
    ```bash
-   keyvault-comparer stage
+   ./run.sh compare <source-vault-uri> <target-vault-uri>
    ```
 
-3. Compare secrets between dev and stage Key Vaults:
-   ```bash
-   keyvault-comparer compare
-   ```
+### Examples
+```bash
+# List secrets from a Key Vault
+./run.sh list https://my-vault.vault.azure.net/
+
+# Compare two Key Vaults
+./run.sh compare https://source-vault.vault.azure.net/ https://target-vault.vault.azure.net/
+```
 
 ## Building from Source
 
@@ -65,16 +51,15 @@ To build the application from source:
 2. Navigate to the project directory
 3. Run the following command:
    ```bash
-   dotnet publish -c Release -r <runtime-identifier>
+   dotnet publish -c Release -r osx-x64
    ```
 
-Replace `<runtime-identifier>` with:
-- `osx-x64` for macOS
-- `win-x64` for Windows
-- `linux-x64` for Linux
-
-The executable will be created in the `bin/Release/net9.0/<runtime-identifier>/publish` directory.
+The executable will be created in the `bin/Release/net9.0/osx-x64/publish` directory.
 
 ## Security Note
 
-This tool requires Azure credentials to access Key Vaults. Make sure you have the appropriate permissions and are using secure methods to manage your credentials. 
+This tool requires Azure credentials to access Key Vaults. Make sure you have the appropriate permissions and are using secure methods to manage your credentials.
+
+## Detailed Instructions
+
+For a complete step-by-step guide with troubleshooting tips, see [STEP_BY_STEP.md](STEP_BY_STEP.md) 
